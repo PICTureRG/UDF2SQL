@@ -1,0 +1,49 @@
+//--bnd-inbits=2 --fe-fpencoding AS_FIXPOINT
+
+include "common/types.skh";
+include "common/String.sk";
+include "common/StringArray.sk";
+include "common/Any.sk";
+include "common/AnyArray.sk";
+include "common/StringAnyArray.sk";
+include "common/StringAnyMap.sk";
+include "common/SQLFunctions.sk";
+include "common/G1.sk";
+include "common/G2.sk";
+include "config.sk";
+
+//////////////////////////////////////////
+// Driver
+int[2] inputs;
+
+generator String SIMPLE_STR() {
+    return {| EMPTY_STRING |};
+}
+
+generator int SIMPLE_INT() {
+    return {| -1 | 0 | 1 |};
+}
+
+generator double SIMPLE_DOUBLE() {
+    return {| 1.0 |};
+}
+
+bit udf(int a, int b) {
+    return 1 && 1;
+}
+
+generator bit SQL(int depth, int grammar) {
+    if (grammar==1) return BOOL1(depth);
+    if (grammar==2) return BOOL2(depth);
+    assert 0;
+}
+
+harness void main(int i1, int i2) {
+    inputs[0] = i1;
+    inputs[1] = i2;
+    
+    bit b1 = udf(i1, i2);
+    bit b2 = SQL(depth, grammar);
+    assert nFunc==depth-1;
+    assert b1==b2;
+}

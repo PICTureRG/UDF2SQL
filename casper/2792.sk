@@ -1,0 +1,53 @@
+//--bnd-inbits=8 --fe-fpencoding AS_FIXPOINT
+
+include "common/types.skh";
+include "common/String.sk";
+include "common/StringArray.sk";
+include "common/Any.sk";
+include "common/AnyArray.sk";
+include "common/StringAnyArray.sk";
+include "common/StringAnyMap.sk";
+include "common/SQLFunctions.sk";
+include "common/G1.sk";
+include "common/G2.sk";
+include "config.sk";
+
+String str1 = new String(sz=1,buf={' '});
+
+
+//////////////////////////////////////////
+// Driver
+String[1] inputs;
+
+generator String SIMPLE_STR() {
+    return {| EMPTY_STRING | inputs[0] | inputs[1] | str1 |};
+}
+
+generator int SIMPLE_INT() {
+    return {| -1 | 0 | 1 |};
+}
+
+generator double SIMPLE_DOUBLE() {
+    return {| 1.0 |};
+}
+
+generator bit SQL(int depth, int grammar) {
+    if (grammar==1) return BOOL1(depth);
+    if (grammar==2) return BOOL2(depth);
+    assert 0;
+}
+
+harness void main(int sz1, char[sz1] buf1) {
+    String x1 = new String(sz=sz1, buf=buf1);
+    inputs[0] = x1;
+    bit t1 = 1;
+    String t2 = String_trim(inputs[0]);
+    int t3 = inputs[0].sz;
+    bit t4; 
+    if (t3 > 0) t4 = 1; else t4 = 0;
+    bit t5 = t1 && t4;
+    bit b2 = SQL(depth, grammar);
+    assert nFunc==depth-1;
+    assert t5==b2;
+}
+

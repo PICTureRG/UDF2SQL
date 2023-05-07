@@ -1,0 +1,76 @@
+//--bnd-inbits=2 --bnd-arr-size=13 --bnd-unroll-amnt=13  --fe-fpencoding AS_FIXPOINT
+
+include "common/types.skh";
+include "common/String.sk";
+include "common/StringArray.sk";
+include "common/Any.sk";
+include "common/AnyArray.sk";
+include "common/StringAnyArray.sk";
+include "common/StringAnyMap.sk";
+include "common/SQLFunctions.sk";
+include "common/G1.sk";
+include "common/G2.sk";
+include "config.sk";
+
+//////////////////////////////////////////
+// Driver
+String[3] inputs;
+
+String STRING1 = new String(sz=13, buf={'c', 'o', 'n', 'f', 'C', 'a', 's', 't', 'E', 'r', 'r', 'o', 'r'});
+String STRING2 = new String(sz=3, buf={'f', 'o', 'o'});
+
+generator String SIMPLE_STR() {
+    return {| EMPTY_STRING | STRING1 | STRING2 | inputs[0] | inputs[1] | inputs[2] |};
+}
+
+generator int SIMPLE_INT() {
+    return {| -1 | 0 | 1 |};
+}
+
+generator double SIMPLE_DOUBLE() {
+    return {| 1.0 |};
+}
+
+generator String SQL1(int depth, int grammar) {
+    if (grammar==1) return STR1(depth);
+    if (grammar==2) return STR2(depth);
+    assert 0;
+}
+
+generator StringArray SQL2(int depth, int grammar) {
+    if (grammar==1) return SARRAY1(depth);
+    if (grammar==2) return SARRAY2(depth);
+    assert 0;
+}
+
+harness void main(int sz1, char[sz1] buf1, int sz2, char[sz2] buf2, int sz3, char[sz3] buf3) {
+    String errCol = new String(sz=sz1, buf=buf1);
+    String rawValue = new String(sz=sz2, buf=buf2);
+    String code = new String(sz=sz3, buf=buf3);
+    inputs[0] = errCol;
+    inputs[1] = rawValue;
+    inputs[2] = code;
+    
+    StringArray t1 = new StringArray(sz=1, buf={rawValue});
+    String t3 = STRING1;
+    String t4 = STRING2;
+
+    String u1 = t3;
+    String u2 = code;
+    String u3 = t4;
+    String u4 = errCol;
+    StringArray u5 = t1;
+
+    String s1 = SQL1(depth, grammar);
+    String s2 = SQL1(depth, grammar);
+    String s3 = SQL1(depth, grammar);
+    String s4 = SQL1(depth, grammar);
+    StringArray s5 = SQL2(depth, grammar);
+    assert nFunc==depth-1;
+
+    assert String_equals(u1, s1);
+    assert String_equals(u2, s2);
+    assert String_equals(u3, s3);
+    assert String_equals(u4, s4);
+    assert StringArray_equals(u5, s5);
+}

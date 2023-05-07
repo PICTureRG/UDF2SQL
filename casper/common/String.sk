@@ -1,0 +1,203 @@
+//////////////////////////////////////////
+// Models of String class
+bit String_equals(String x, String y) {
+    if (x.sz != y.sz) return 0;
+    for (int i=0; i<x.sz; i++) {
+        if (x.buf[i] != y.buf[i]) return 0;
+    }
+    return 1;
+}
+
+String String_concat(String x, String y) {
+    String z = new String(sz = x.sz+y.sz);
+    for (int i=0; i<x.sz; i++) {
+        z.buf[i] = x.buf[i];
+    }
+    for (int i=0; i<y.sz; i++) {
+        z.buf[x.sz+i] = y.buf[i];
+    }
+    return z;
+}
+
+String String_fromdouble(double d) {
+    char[256] buf;
+    int size = 0;
+    bit sign = d < 0.0;
+    if (sign) {
+        d *= -1.0;
+        buf[size++] = '-';
+    }
+
+    assume d < (double)(1 << 30);
+    int id = (int) d;
+    double frac = d - (double)id;
+    if (id == 0) {
+        buf[size++] = '0';
+    } else {
+        int m = 1;
+        while (m*10 <= id) m *= 10;
+        while (m > 0) {
+            buf[size++] = '0' + id / m;
+            id = id % m;
+            m /= 10;
+        }
+    }
+
+    buf[size++] = '.';
+
+    for (int i=0; i<3; i++) {
+        frac *= 10.0;
+        int t = (int) frac;
+        buf[size++] = '0' + t;
+        frac -= (double)t;
+    }
+
+    return new String(sz=size, buf=buf[0::size]);
+}
+
+String String_fromint(int i) {
+    char[256] buf;
+    int size = 0;
+
+    if (i == 0) {
+        buf[255] = '0';
+        size = 1;
+    } else {
+        bit sign = i < 0;
+        if (sign) i *= -1;
+
+        while (i > 0) {
+            buf[255-(size++)] = '0' + i % 10;
+            i /= 10;
+        }
+
+        if (sign) buf[255-(size++)] = '-';
+    }
+
+    return new String(sz=size, buf=buf[256-size::1]);
+}
+
+int String_locate(String hay, String needle, int p) {
+    assume p>=0;
+    for (int i=p; i<=hay.sz-needle.sz; i++) {
+        String x = new String(sz=needle.sz, buf=hay.buf[i::needle.sz]);
+        if (String_equals(x, needle)) return i;
+    }
+    return -1;
+}
+
+String String_replace(String str, String search, String replace) {
+    if (search.sz == 0) return str;
+    int noccur=0;
+    int pos=0;
+    while (pos < str.sz) {
+        int next = String_locate(str, search, pos);
+        if (next >= 0) {
+            noccur += 1;
+            pos = next + search.sz;
+        } else {
+            pos = str.sz;
+        }
+    }
+
+    int size = str.sz + noccur * ( replace.sz - search.sz);
+    String ret = new String(sz=size);
+
+    pos = 0;
+    int i=0;
+    while (pos < str.sz) {
+        int next = String_locate(str, search, pos);
+        if (next >= 0) {
+            int l = next - pos;
+            ret.buf[i::l] = str.buf[pos::l];
+            ret.buf[i+l::replace.sz] = replace.buf[0::replace.sz];
+            i += l + replace.sz;
+            pos = next + search.sz;
+        } else {
+            ret.buf[i::str.sz-pos]=str.buf[pos::str.sz-pos];
+            pos = str.sz;
+        }
+    }
+
+    return ret;
+}
+
+StringArray String_split(String str, String delim) {
+    assume delim.sz > 0;
+    int sz=1;
+    for (int p=String_locate(str, delim, 0); p!=-1; p=String_locate(str, delim, p+delim.sz)) {
+        sz ++;
+    }
+    StringArray arr = new StringArray(sz=sz);
+
+    int p=0;
+    for (int i=0; i<sz; i++) {
+        int next = String_locate(str, delim, p);
+        if (next == -1) {
+            arr.buf[i] = new String(sz=str.sz-p, buf=str.buf[p::str.sz-p]);
+        } else {
+            arr.buf[i] = new String(sz=next-p, buf=str.buf[p::next-p]);
+            p += delim.sz;
+        }
+    }
+
+    return arr;
+}
+
+double String_todouble(String str) {
+    assume str.sz > 0;
+
+    double ret = 0.0;
+    char c = str.buf[0];
+    double sign = c == '-' ? -1.0 : 1.0;
+    int i = (c == '-' || c == '+') ? 1 : 0;
+    assume str.sz > i;
+    for (;i<str.sz; i++) {
+        char c1 = str.buf[i];
+        assume ('0' <= c1 && c1 <= '9') || c1 == '.';
+        if (c1 == '.') break;
+        ret = ret * 10.0 + (double)(c1 - '0');
+    }
+
+    if (i < str.sz) {
+        assume str.buf[i] == '.';
+        i ++;
+    }
+    assume str.sz > i;
+    double factor = 0.1;
+    for (; i<str.sz; i++) {
+        char c1 = str.buf[i];
+        assume '0' <= c1 && c1 <= '9';
+        ret += factor * (double)(c1 - '0');
+        factor *= 0.1;
+    }
+
+    return ret * sign;
+}
+
+int String_toint(String str) {
+    assume str.sz > 0;
+
+    int ret = 0;
+    char c = str.buf[0];
+    int sign = c == '-' ? -1 : 1;
+    int i = (c == '-' || c == '+') ? 1 : 0;
+    assume str.sz > i;
+    for (;i<str.sz; i++) {
+        char c1 = str.buf[i];
+        assume '0' <= c1 && c1 <= '9';
+        ret = ret * 10 + c1 - '0';
+    }
+    return ret * sign;
+}
+
+String String_trim(String str) {
+    int s = 0;
+    int e = str.sz;
+    while (s < str.sz && (str.buf[s] == ' ' || str.buf[s] == '\t')) s ++;
+    while (e > s && (str.buf[e-1] == ' ' || str.buf[e-1] == '\t')) e --;
+
+    return new String(sz=e-s,buf=str.buf[s::e-s]);
+}
+
+String EMPTY_STRING = new String(sz=0,buf={});

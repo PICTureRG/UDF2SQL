@@ -1,0 +1,56 @@
+//--bnd-inbits=2 --fe-fpencoding AS_FIXPOINT
+
+include "common/types.skh";
+include "common/String.sk";
+include "common/StringArray.sk";
+include "common/Any.sk";
+include "common/AnyArray.sk";
+include "common/StringAnyArray.sk";
+include "common/StringAnyMap.sk";
+include "common/SQLFunctions.sk";
+include "common/G1.sk";
+include "common/G2.sk";
+include "config.sk";
+
+String str1 = new String(sz=1,buf={':'});
+int math_mod(int a, int b) {
+    return a % b;
+}
+
+
+//////////////////////////////////////////
+// Driver
+int[1] input0;
+String[1] input1;
+
+generator String SIMPLE_STR() {
+    return {| EMPTY_STRING | str1 | input1[0] |};
+}
+
+generator int SIMPLE_INT() {
+    return {| -1 | 0 | 1 | input0[0] |};
+}
+
+generator double SIMPLE_DOUBLE() {
+    return {| 1.0 |};
+}
+
+generator String SQL(int depth, int grammar) {
+    if (grammar==1) return STR1(depth);
+    if (grammar==2) return STR2(depth);
+    assert 0;
+}
+
+harness void main(int i1, int sz1, char[sz1] buf1) {
+    input0[0] = i1;
+    String x1 = new String(sz=sz1, buf=buf1);
+    input1[0] = x1;
+
+    String t2 = String_fromint(input0[0]);
+    String t3 = String_concat(t2, str1);
+    String t1 = String_concat(t3, input1[0]);
+    String b2 = SQL(depth, grammar);
+    assert nFunc==depth-1;
+    assert String_equals(t1, b2);
+}
+

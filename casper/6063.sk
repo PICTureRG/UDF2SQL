@@ -1,0 +1,102 @@
+//--bnd-inbits=2 --fe-fpencoding AS_FIXPOINT
+
+include "common/types.skh";
+include "common/String.sk";
+include "common/StringArray.sk";
+include "common/Any.sk";
+include "common/AnyArray.sk";
+include "common/StringAnyArray.sk";
+include "common/StringAnyMap.sk";
+include "common/SQLFunctions.sk";
+include "common/G1.sk";
+include "common/G2.sk";
+include "config.sk";
+
+
+
+struct Tuple{
+    Integer _1;
+    String _2;
+}
+
+struct Tuple1{
+    String _1;
+    Integer _2;
+}
+
+struct Integer{
+    int i;
+}
+
+Tuple Tuple_construct(Integer a, String b) {
+    Tuple ret = new Tuple(_1=a, _2=b);
+    return ret;
+}
+
+Tuple1 Tuple1_construct(String a, Integer b) {
+    Tuple1 ret = new Tuple1(_1=a, _2=b);
+    return ret;
+}
+
+Tuple1 Tuple_swap(Tuple t) {
+    return Tuple1_construct(t._2, t._1);
+}
+
+int unboxLong(Integer l) {
+    return l.i;
+}
+
+include "config.sk";
+
+//////////////////////////////////////////
+// Driver
+int[1] input0;
+String[1] input1;
+
+generator String SIMPLE_STR() {
+    return {| EMPTY_STRING | input1[0] |};
+}
+
+generator int SIMPLE_INT() {
+    return {| -1 | 0 | 1 | input0[0]|};
+}
+
+generator double SIMPLE_DOUBLE() {
+    return {| 1.0 |};
+}
+
+generator String SQL1(int depth, int grammar) {
+    if (grammar==1) return STR1(depth);
+    if (grammar==2) return STR2(depth);
+    assert 0;
+}
+
+generator int SQL2(int depth, int grammar) {
+    if (grammar==1) return INT1(depth);
+    if (grammar==2) return INT2(depth);
+    assert 0;
+}
+
+harness void main(int i1, int sz1, char[sz1] buf1) {
+    String x = new String(sz=sz1, buf=buf1);
+
+    input0[0] = i1;
+    input1[0] = x;
+
+    Integer I = new Integer();
+    I.i= input0[0];
+
+    //udf
+    Tuple t5 = Tuple_construct(I,x);
+    Tuple1 a = Tuple_swap(t5);
+    String t6 = a._1;
+    int t7 = unboxLong(a._2);
+
+
+    // sql
+    String o1 = SQL1(depth, grammar);
+    int o2 = SQL2(depth, grammar);
+    assert nFunc==depth-1;
+    assert o1 == t6 && o2 == t7;
+
+}

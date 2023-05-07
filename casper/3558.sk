@@ -1,0 +1,51 @@
+//--bnd-inbits=7 --fe-fpencoding AS_FIXPOINT
+
+include "common/types.skh";
+include "common/String.sk";
+include "common/StringArray.sk";
+include "common/Any.sk";
+include "common/AnyArray.sk";
+include "common/StringAnyArray.sk";
+include "common/StringAnyMap.sk";
+include "common/SQLFunctions.sk";
+include "common/G1.sk";
+include "common/G2.sk";
+include "config.sk";
+
+//////////////////////////////////////////
+// Driver
+double[1] inputs;
+
+generator String SIMPLE_STR() {
+    return {| EMPTY_STRING |};
+}
+
+generator int SIMPLE_INT() {
+    return {| -1 | 0 | 1 |};
+}
+
+generator double SIMPLE_DOUBLE() {
+    return {| 1.0 | 9.0 | 5.0 | 32.0 | inputs[0] |};
+}
+
+double udf(double degree) {
+    double t1 = degree * 9.0;
+    double t2 = t1 / 5.0;
+    double t3 = t2 + 32.0;
+    return t3;
+}
+
+generator double SQL(int depth, int grammar) {
+    if (grammar==1) return DOUBLE1(depth);
+    if (grammar==2) return DOUBLE2(depth);
+    assert 0;
+}
+
+harness void main(double degree) {
+    inputs[0] = degree;
+    
+    double z1 = udf(degree);
+    double z2 = SQL(depth, grammar);
+    assert nFunc==depth-1;
+    assert z1 == z2;
+}

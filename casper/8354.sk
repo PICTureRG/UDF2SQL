@@ -1,0 +1,55 @@
+//--bnd-inbits=8 --fe-fpencoding AS_FIXPOINT
+
+include "common/types.skh";
+include "common/String.sk";
+include "common/StringArray.sk";
+include "common/Any.sk";
+include "common/AnyArray.sk";
+include "common/StringAnyArray.sk";
+include "common/StringAnyMap.sk";
+include "common/SQLFunctions.sk";
+include "common/G1.sk";
+include "common/G2.sk";
+include "config.sk";
+
+//////////////////////////////////////////
+// Driver
+String[1] inputs;
+
+String CA = new String(sz=2, buf={'C', 'A'});
+String OR = new String(sz=2, buf={'O', 'R'});
+String AK = new String(sz=2, buf={'A', 'K'});
+String WA = new String(sz=2, buf={'W', 'A'});
+
+generator String SIMPLE_STR() {
+    return {| EMPTY_STRING | CA | OR | AK | WA | inputs[0] |};
+}
+
+generator int SIMPLE_INT() {
+    return {| -1 | 0 | 1 |};
+}
+
+generator double SIMPLE_DOUBLE() {
+    return {| 1.0 |};
+}
+
+generator bit SQLB(int depth, int grammar) {
+    if (grammar==1) return BOOL1(depth);
+    if (grammar==2) return BOOL2(depth);
+    assert 0;
+}
+
+harness void main(int sz1, char[sz1] buf1) {
+    assume sz1 <= 2;
+    inputs[0] = new String(sz=sz1, buf=buf1);
+
+    StringArray t1_0 = StringArray2(CA, OR);
+    StringArray t1_1 = StringArray2(WA, AK);
+    StringArray t1 = StringArray_concat(t1_0, t1_1);
+    bit t2 = StringArray_contains(t1, inputs[0]);
+
+    bit o1 = SQLB(depth, grammar);
+    assert nFunc==depth-1;
+
+    assert t2 == o1;
+}

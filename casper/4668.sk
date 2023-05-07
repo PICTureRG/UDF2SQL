@@ -1,0 +1,61 @@
+//--bnd-inbits=3 --fe-fpencoding AS_FIXPOINT
+
+include "common/types.skh";
+include "common/String.sk";
+include "common/StringArray.sk";
+include "common/Any.sk";
+include "common/AnyArray.sk";
+include "common/StringAnyArray.sk";
+include "common/StringAnyMap.sk";
+include "common/SQLFunctions.sk";
+include "common/G1.sk";
+include "common/G2.sk";
+include "config.sk";
+
+//////////////////////////////////////////
+// Driver
+String[4] inputs;
+
+String STRA = new String(sz=1, buf={','});
+
+generator String SIMPLE_STR() {
+    return {| EMPTY_STRING | STRA | inputs[0] | inputs[1] | inputs[2] | inputs[3] |};
+}
+
+generator int SIMPLE_INT() {
+    return {| -1 | 0 | 1  |};
+}
+
+generator double SIMPLE_DOUBLE() {
+    return {| 1.0 |};
+}
+
+generator String SQLS(int depth, int grammar) {
+    if (grammar==1) return STR1(depth);
+    if (grammar==2) return STR2(depth);
+    assert 0;
+}
+
+harness void main(int sz1, char[sz1] buf1, int sz2, char[sz2] buf2, int sz3, char[sz3] buf3, int sz4, char[sz4] buf4) {
+    String t1 = new String(sz=sz1, buf=buf1);
+    String t2 = new String(sz=sz2, buf=buf2);
+    String t3 = new String(sz=sz3, buf=buf3);
+    String command = new String(sz=sz4, buf=buf4);
+
+    inputs[0] = t1;
+    inputs[1] = t2;
+    inputs[2] = t3;
+    inputs[3] = command;
+
+    String t4 = String_concat(t1, STRA);
+    String t5 = String_concat(t4, t2);
+    String t6 = String_concat(t4, STRA);
+    String pack = String_concat(t6, t3);
+
+    String o1 = SQLS(depth, grammar);
+    String o2 = SQLS(depth, grammar);
+    assert nFunc==depth-1;
+
+    assert String_equals(pack, o1);
+    assert String_equals(command, o2);
+}

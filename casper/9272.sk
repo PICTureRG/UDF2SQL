@@ -1,0 +1,53 @@
+//--bnd-inbits=8 --fe-fpencoding AS_FIXPOINT
+
+include "common/types.skh";
+include "common/String.sk";
+include "common/StringArray.sk";
+include "common/Any.sk";
+include "common/AnyArray.sk";
+include "common/StringAnyArray.sk";
+include "common/StringAnyMap.sk";
+include "common/SQLFunctions.sk";
+include "common/G1.sk";
+include "common/G2.sk";
+include "config.sk";
+
+String str1 = new String(sz=1,buf={' '});
+int math_mod(int a, int b) {
+    return a % b;
+}
+
+
+//////////////////////////////////////////
+// Driver
+int[1] inputs;
+
+generator String SIMPLE_STR() {
+    return {| EMPTY_STRING |};
+}
+
+generator int SIMPLE_INT() {
+    return {| -1 | 0 | 1 | inputs[0] | 103 |};
+}
+
+generator double SIMPLE_DOUBLE() {
+    return {| 1.0 |};
+}
+
+generator bit SQL(int depth, int grammar) {
+    if (grammar==1) return BOOL1(depth);
+    if (grammar==2) return BOOL2(depth);
+    assert 0;
+}
+
+harness void main(int i1) {
+    inputs[0] = i1;
+    int t2 = 103;
+    int t3 = math_mod(inputs[0], t2);
+    bit t4;
+    if (t3 != 0) t4 = 1; else t4 = 0;
+    bit b2 = SQL(depth, grammar);
+    assert nFunc==depth-1;
+    assert t4==b2;
+}
+

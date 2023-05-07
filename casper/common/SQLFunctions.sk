@@ -1,0 +1,252 @@
+//////////////////////////////////////////
+// Models of SQL functions
+int SQL_cast_str2int(String str) {
+    return String_toint(str);
+}
+
+
+double SQL_cast_str2double(String str) {
+    return String_todouble(str);
+}
+
+
+String SQL_cast_int2str(int i) {
+    return String_fromint(i);
+}
+
+String SQL_concat(String x, String y) {
+    return String_concat(x, y);
+}
+
+bit SQL_eq(int a, int b) {
+    return a==b;
+}
+
+bit SQL_eq_double(double a, double b) {
+    return a==b;
+}
+
+bit SQL_eq_str(String x, String y) {
+    return String_equals(x, y);
+}
+
+bit SQL_if_bool(bit s, bit a, bit b) {
+    if (s) return a;
+    return b;
+}
+
+double SQL_if_double(bit s, double a, double b) {
+    if (s) return a;
+    return b;
+}
+
+int SQL_if_int(bit s, int a, int b) {
+    if (s) return a;
+    return b;
+}
+
+bit SQL_not(bit x) {
+    return !x;
+}
+
+bit SQL_lt_double(double a, double b) {
+    return a<b;
+}
+
+StringArray SQL_string_array2(String a, String b) {
+    return new StringArray(sz=2, buf={a,b});
+}
+
+String SQL_substring_index(String str, String delim, int i) {
+    assume i>=0;
+    assume delim.sz > 0;
+    int p = String_locate(str, delim, 0);
+    while (p != -1 && i>0) {
+        i --;
+        p=String_locate(str, delim, p+delim.sz);
+    }
+    if (p == -1) {
+        return new String(sz=str.sz, buf=str.buf);
+    } else {
+        return new String(sz=p, buf=str.buf[0::p]);
+    }
+}
+
+String SQL_trim(String s) {
+    return String_trim(s);
+}
+
+int SQL_add(int x, int y) {
+    return x + y;
+}
+
+int SQL_sub(int x, int y) {
+    return x - y;
+}
+
+int SQL_mul(int x, int y) {
+    return x * y;
+}
+
+int SQL_div(int x, int y) {
+    return x / y;
+}
+
+double SQL_addD(double x, double y) {
+    return x + y;
+}
+
+double SQL_subD(double x, double y) {
+    return x - y;
+}
+
+double SQL_mulD(double x, double y) {
+    return x * y;
+}
+
+double SQL_divD(double x, double y) {
+    return x / y;
+}
+
+String SQL_replace2(String x, String y, String z) {
+    return String_replace(x, y, z);
+}
+
+StringArray SQL_string_array1(String s) {
+    return new StringArray(sz=1, buf={s});
+}
+
+StringAnyMap SQL_map_string_any_from_arrays(StringArray sa, AnyArray aa) {
+    assume sa.sz == aa.sz;
+    StringAnyMap ret = new StringAnyMap(sz=sa.sz);
+    for (int i=0; i<sa.sz; i++) {
+        ret.buf[i] = new StringAny(_1=sa.buf[i], _2=aa.buf[i]);
+    }
+    return ret;
+}
+
+AnyArray SQL_any_array1(Any a) {
+    return new AnyArray(sz=1, buf={a});
+}
+
+AnyArray SQL_any_array2(Any a, Any b) {
+    return new AnyArray(sz=2, buf={a, b});
+}
+
+bit SQL_string_array_contains(StringArray sa, String s) {
+    return StringArray_contains(sa, s);
+}
+
+StringArray SQL_string_array_intersect(StringArray a, StringArray b) {
+    return StringArray_intersect(a, b);
+}
+
+StringArray SQL_string_array0() {
+    return new StringArray(sz=0, buf={});
+}
+
+String SQL_astring_get(StringArray sa, int i) {
+    return sa.buf[i];
+}
+
+int SQL_astring_len(StringArray a) {
+    return a.sz;
+}
+
+StringArray SQL_if_astr(bit b, StringArray x, StringArray y) {
+    if (b) return x;
+    return y;
+}
+
+String SQL_if_str(bit b, String x, String y) {
+    if (b) return x;
+    return y;
+}
+
+bit SQL_le(int a, int b) {
+    return a <= b;
+}
+
+bit SQL_le_double(double a, double b) {
+    return a <= b;
+}
+
+int SQL_length(String s) {
+    return s.sz;
+}
+
+int SQL_locate2(String n, String h, int p) {
+    return String_locate(h, n, p);
+}
+
+String SQL_lower(String s) {
+    String ret = new String(sz=s.sz);
+    for (int i=0; i<s.sz; i++) {
+        char c = s.buf[i];
+        if ('A' <= c && c <= 'Z') ret.buf[i] = c - ('a' - 'A');
+        else ret.buf[i] = c;
+    }
+    return ret;
+}
+
+StringAnyMap SQL_map_string_any_concat(StringAnyMap a, StringAnyMap b) {
+    StringAnyMap ret = new StringAnyMap(sz=a.sz+b.sz);
+    for (int i=0; i<a.sz; i++) {
+        ret.buf[i] = a.buf[i];
+    }
+    for (int i=0;i<b.sz; i++) {
+        ret.buf[a.sz+i] = b.buf[i];
+    }
+    return ret;
+}
+
+StringArray SQL_map_string_any_keys(StringAnyMap x) {
+    StringArray ret = new StringArray(sz=x.sz);
+    for (int i=0; i<x.sz; i++) {
+        ret.buf[i] = x.buf[i]._1;
+    }
+    return ret;
+}
+
+AnyArray SQL_map_string_any_values(StringAnyMap x) {
+    AnyArray ret = new AnyArray(sz=x.sz);
+    for (int i=0; i<x.sz; i++) {
+        ret.buf[i] = x.buf[i]._2;
+    }
+    return ret;
+}
+
+int SQL_mod(int a, int b) {
+    return a % b;
+}
+
+bit SQL_neq(int a, int b) {
+    return a != b;
+}
+
+StringArray SQL_string_array_concat(StringArray a, StringArray b) {
+    return StringArray_concat(a, b);
+}
+
+String SQL_substring2(String str, int s, int e) {
+    return new String(sz=e-s, buf=str.buf[s::e-s]);
+}
+
+String SQL_string_array_join(StringArray a, String sep) {
+    if (a.sz == 0) return EMPTY_STRING;
+    int size=a.buf[0].sz;
+    for (int i=1; i<a.sz; i++) {
+        size += a.buf[i].sz + sep.sz;
+    }
+
+    String ret = new String(sz=size);
+    int l = a.buf[0].sz;
+    ret.buf[0::l] = a.buf[0].buf[0:l];
+    for (int i=1; i<a.sz; i++) {
+        ret.buf[l::sep.sz] = sep.buf[0::sep.sz];
+        int x = a.buf[i].sz;
+        ret.buf[l+sep.sz::x] = a.buf[i].buf[0::x];
+        l += x + sep.sz;
+    }
+    return ret;
+}

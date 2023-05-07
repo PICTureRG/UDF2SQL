@@ -1,0 +1,62 @@
+//--bnd-inbits=3 --fe-fpencoding AS_FIXPOINT
+
+include "common/types.skh";
+include "common/String.sk";
+include "common/StringArray.sk";
+include "common/Any.sk";
+include "common/AnyArray.sk";
+include "common/StringAnyArray.sk";
+include "common/StringAnyMap.sk";
+include "common/SQLFunctions.sk";
+include "common/G1.sk";
+include "common/G2.sk";
+include "config.sk";
+
+//////////////////////////////////////////
+// Driver
+String[1] inputs;
+int[1] inputi;
+
+String SEPSTR = new String(sz=1, buf={'_'});
+
+generator String SIMPLE_STR() {
+    return {| EMPTY_STRING | SEPSTR | inputs[0] |};
+}
+
+generator int SIMPLE_INT() {
+    return {| -1 | 0 | 1 | inputi[0] |};
+}
+
+generator double SIMPLE_DOUBLE() {
+    return {| 1.0 |};
+}
+
+generator String SQLS(int depth, int grammar) {
+    if (grammar==1) return STR1(depth);
+    if (grammar==2) return STR2(depth);
+    assert 0;
+}
+
+generator int SQLI(int depth, int grammar) {
+    if (grammar==1) return INT1(depth);
+    if (grammar==2) return INT2(depth);
+    assert 0;
+}
+
+harness void main(int t2, int sz1, char[sz1] buf1) {
+    inputi[0] = t2;
+    inputs[0] = new String(sz=sz1, buf=buf1);
+
+    StringArray keys = String_split(inputs[0], SEPSTR);
+    String adname = StringArray_get(keys, 0);
+    String website = StringArray_get(keys, 1);
+
+    String o1 = SQLS(depth, grammar);
+    int o2 = SQLI(depth, grammar);
+    String o3 = SQLS(depth, grammar);
+    assert nFunc==depth-1;
+
+    assert String_equals(adname, o1);
+    assert o2 == t2;
+    assert String_equals(website, o3);
+}

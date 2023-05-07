@@ -1,0 +1,60 @@
+//--bnd-inbits=2 --bnd-unroll-amnt=16 --fe-fpencoding AS_FIXPOINT
+
+include "common/types.skh";
+include "common/String.sk";
+include "common/StringArray.sk";
+include "common/Any.sk";
+include "common/AnyArray.sk";
+include "common/StringAnyArray.sk";
+include "common/StringAnyMap.sk";
+include "common/SQLFunctions.sk";
+include "common/G1.sk";
+include "common/G2.sk";
+include "config.sk";
+
+//////////////////////////////////////////
+// Driver
+Any[2] inputs;
+
+String STRING1 = new String(sz=13, buf={'d', 'e', 'v', 'i', 'c', 'e', '_', 'f', 'a', 'm', 'i', 'l', 'y'});
+String STRING2 = new String(sz=5, buf={'c', 'o', 'u', 'n', 't'});
+
+generator String SIMPLE_STR() {
+    return {| EMPTY_STRING | STRING1 | STRING2 |};
+}
+
+generator int SIMPLE_INT() {
+    return {| -1 | 0 | 1 |};
+}
+
+generator double SIMPLE_DOUBLE() {
+    return {| 1.0 |};
+}
+
+StringAnyMap udf(Any t2, Any t3) {
+    StringArray t1 = StringArray2(STRING1, STRING2);
+    AnyArray t4 = AnyArray2(t2, t3);
+    StringAnyArray t5 = StringAnyArray_zip(t1, t4);
+    StringAnyMap t6 = StringAnyArray_toMap(t5);
+    return t6;
+}
+
+generator StringAnyMap SQL(int depth, int grammar) {
+    if (grammar==1) return SAMAP1(depth);
+    if (grammar==2) return SAMAP2(depth);
+    assert 0;
+}
+
+harness void main(int tpe, int sz, char[sz] buf, int tpe1, int sz1, char[sz1] buf1) {
+    Any t2 = new Any(tpe=tpe, sz=sz, buf=buf);
+    any_inputs[0] = t2;
+    Any t3 = new Any(tpe=tpe1, sz=sz1, buf=buf1);
+    any_inputs[1] = t3;
+
+    n_any_inputs = 2;
+    
+    StringAnyMap o1 = udf(t2, t3);
+    StringAnyMap o2 = SQL(depth, grammar);
+    assert nFunc==depth-1;
+    assert StringAnyMap_equals(o1, o2);
+}

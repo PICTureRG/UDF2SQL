@@ -1,0 +1,63 @@
+int nFunc = 0;
+
+generator String STR1(int d) {
+    if (d==1) return SIMPLE_STR();
+    if (??) return SIMPLE_STR();
+    nFunc ++;
+    return {| SQL_cast_int2str(INT1(d-1)) | SQL_concat(STR1(d-1), STR1(d-1)) | SQL_substring_index(STR1(d-1), STR1(d-1), INT1(d-1)) | SQL_trim(STR1(d-1)) |};
+}
+
+generator int INT1(int d) {
+    if (d==1) return SIMPLE_INT();
+    nFunc ++;
+    return {| SIMPLE_INT() | SQL_if_int(BOOL1(d-1), INT1(d-1), INT1(d-1)) | SQL_cast_str2int(STR1(d-1)) |};
+}
+
+generator bit BOOL1(int d) {
+    if (d==1) {
+        assert 0;
+        return 0;
+    }
+    nFunc ++;
+    return {| SQL_eq(INT1(d-1), INT1(d-1)) | SQL_eq_double(DOUBLE1(d-1), DOUBLE1(d-1)) | SQL_eq_str(STR1(d-1), STR1(d-1)) | SQL_if_bool(BOOL1(d-1), BOOL1(d-1), BOOL1(d-1)) | SQL_lt_double(DOUBLE1(d-1), DOUBLE1(d-1)) | SQL_not(BOOL1(d-1)) |};
+}
+
+generator double DOUBLE1(int d) {
+    if (d==1) return SIMPLE_DOUBLE();
+    if (??) return SIMPLE_DOUBLE();
+    nFunc ++;
+    return {| SQL_if_double(BOOL1(d-1), DOUBLE1(d-1), DOUBLE1(d-1)) | SQL_cast_str2double(STR1(d-1)) |};
+}
+
+StringArray[4] string_array_inputs;
+int n_string_array_inputs = 0;
+generator StringArray SARRAY_INPUT() {
+    int i=??;
+    assert 0 <= i && i < n_string_array_inputs;
+    return string_array_inputs[i];
+}
+
+generator StringArray SARRAY1(int d) {
+    if (d == 1) return SARRAY_INPUT();
+    if (??) return SARRAY_INPUT();
+    nFunc ++;
+    return {| SQL_string_array2(STR1(d-1), STR2(d-1)) |};
+}
+
+generator StringAnyMap SAMAP1(int d) {
+    assert 0;
+    return new StringAnyMap(sz=0);
+}
+
+generator AnyArray AARRAY1(int d) {
+    assert 0;
+    return new AnyArray(sz=0);
+}
+
+Any[4] any_inputs;
+int n_any_inputs = 0;
+generator Any Any1(int d) {
+    int i=??;
+    assert 0 <= i && i < n_any_inputs;
+    return any_inputs[i];
+}

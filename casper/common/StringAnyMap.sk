@@ -1,0 +1,10 @@
+//////////////////////////////////////////
+// Models of Map[(String, Any)]
+bit StringAnyMap_equals(StringAnyMap a, StringAnyMap b) {
+    if (a.sz != b.sz) return 0;
+    for (int i=0; i<a.sz; i++) {
+        if (! String_equals(a.buf[i]._1, b.buf[i]._1)) return 0;
+        if (! Any_equals(a.buf[i]._2, b.buf[i]._2)) return 0;
+    }
+    return 1;
+}

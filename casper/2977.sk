@@ -1,0 +1,54 @@
+//--bnd-inbits=3 --fe-fpencoding AS_FIXPOINT
+
+include "common/types.skh";
+include "common/String.sk";
+include "common/StringArray.sk";
+include "common/Any.sk";
+include "common/AnyArray.sk";
+include "common/StringAnyArray.sk";
+include "common/StringAnyMap.sk";
+include "common/SQLFunctions.sk";
+include "common/G1.sk";
+include "common/G2.sk";
+include "config.sk";
+
+//////////////////////////////////////////
+// Driver
+String[1] inputs;
+int[1] inputi;
+
+String STRNAME = new String(sz=5, buf={'n', 'a', 'm', 'e', ':'});
+String STRAGE  = new String(sz=5, buf={'\t', 'a', 'g', 'e', ':'});
+
+generator String SIMPLE_STR() {
+    return {| EMPTY_STRING | STRNAME | STRAGE | inputs[0] |};
+}
+
+generator int SIMPLE_INT() {
+    return {| -1 | 0 | 1 | inputi[0] |};
+}
+
+generator double SIMPLE_DOUBLE() {
+    return {| 1.0 |};
+}
+
+generator String SQLS(int depth, int grammar) {
+    if (grammar==1) return STR1(depth);
+    if (grammar==2) return STR2(depth);
+    assert 0;
+}
+
+harness void main(int t4, int sz1, char[sz1] buf1) {
+    inputi[0] = t4;
+    inputs[0] = new String(sz=sz1, buf=buf1);
+
+    String t2 = String_concat(STRNAME, inputs[0]);
+    String t3 = String_concat(t2, STRAGE);
+    String t6 = String_fromint(t4);
+    String t5 = String_concat(t3, t6);
+
+    String o1 = SQLS(depth, grammar);
+    assert nFunc==depth-1;
+
+    assert String_equals(t5, o1);
+}

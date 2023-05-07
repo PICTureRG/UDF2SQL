@@ -1,0 +1,8 @@
+bit Any_equals(Any a, Any b) {
+    if (a.tpe != b.tpe) return 0;
+    if (a.sz != b.sz) return 0;
+    for (int i=0; i<a.sz; i++) {
+        if (a.buf[i] != b.buf[i]) return 0;
+    }
+    return 1;
+}

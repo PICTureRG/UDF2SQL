@@ -1,0 +1,132 @@
+# First, specify the types that will be used
+#enum ConstBool {
+#    "True", "False"
+#}
+
+enum ConstString 
+{
+    {{ const_string | default('""', true) }}
+}
+
+enum ConstInt {
+    {{ const_int | default('"1","-1","0"', true) }}
+}
+
+enum ConstAString {
+    "[]"
+}
+
+enum ConstAAny {
+    "[]"
+}
+
+enum ConstAStringAny {
+    "[]"
+}
+
+enum ConstMStringAny {
+    "{}"
+}
+
+enum ConstDouble {
+    {{ const_double | default('"1.0"', true)}}
+}
+
+value Int {
+    value: int;
+}
+
+value String {
+    strlen: int;
+}
+
+value Bool {
+    True: bool;
+}
+
+value Any;
+
+value AString {
+    size: int;
+}
+
+value AAny {
+    size: int;
+}
+
+value AStringAny {
+    size: int;
+}
+
+value MStringAny {
+    size: int;
+}
+
+value Double;
+
+{% if columns is defined and columns != None%}
+value Row;
+{% endif %}
+
+value Empty;
+
+# Next, specify the input/output of the synthesized program
+program SQL{{ program_type | default("(String, Bool) -> String", true) }};
+
+# Finally, specify the production rules
+func constInt: Int -> ConstInt;
+func constString: String -> ConstString;
+func constDouble: Double -> ConstDouble;
+
+{% if columns is defined and columns != None %}
+func row: Row o -> {{ columns }};
+{% endif %}
+
+
+func cast_int2str: String o -> Int i;
+func cast_str2int: Int o -> String i;
+func cast_str2double: Double o -> String i;
+func concat: String o -> String i1, String i2 {
+    strlen(o) == strlen(i1) + strlen(i2);
+}
+func eq: Bool o -> Int a, Int b {
+    if value(a) == value(b) then
+        True(o)
+    else
+        ! True(o);
+}
+func eq_str: Bool o -> String i1, String i2 {
+    True(o) ==> strlen(i1) == strlen(i2);
+}
+func eq_double: Bool o -> Double i1, Double i2;
+
+func if_bool: Bool o -> Bool b, Bool b1, Bool b2 {
+    if True(b) then
+        True(o) == True(b1)
+    else
+        True(o) == True(b2);
+}
+func if_int: Int o -> Bool b, Int i1, Int i2 {
+    if True(b) then
+        value(o) == value(i1)
+    else
+        value(o) == value(i2);
+}
+func if_double: Double o -> Bool b, Double i1, Double i2;
+func lt_double: Bool o -> Double a, Double b;
+func not: Bool o -> Bool i {
+    if True(i) then
+        ! True(o)
+    else
+        True(o);
+}
+func string_array2: AString o -> String a, String b {
+    size(o) == 2;
+}
+func substring_index: String o -> String i, String delim, Int l {
+    strlen(delim) > 0 ==> strlen(o) <= strlen(i);
+}
+func trim: String o -> String i {
+    strlen(o) <= strlen(i);
+}
+func empty: Empty -> Empty;

@@ -1,0 +1,60 @@
+//--bnd-inbits=4 --fe-fpencoding AS_FIXPOINT
+
+include "common/types.skh";
+include "common/String.sk";
+include "common/StringArray.sk";
+include "common/Any.sk";
+include "common/AnyArray.sk";
+include "common/StringAnyArray.sk";
+include "common/StringAnyMap.sk";
+include "common/SQLFunctions.sk";
+include "common/G1.sk";
+include "common/G2.sk";
+include "config.sk";
+
+//////////////////////////////////////////
+// Driver
+double[2] inputs;
+
+generator String SIMPLE_STR() {
+    return {| EMPTY_STRING |};
+}
+
+generator int SIMPLE_INT() {
+    return {| -1 | 0 | 1 | 2 |};
+}
+
+generator double SIMPLE_DOUBLE() {
+    return {| 1.0 | inputs[0] | inputs[1] |};
+}
+
+generator double SQL(int depth, int grammar) {
+    if (grammar==1) return DOUBLE1(depth);
+    if (grammar==2) return DOUBLE2(depth);
+    assert 0;
+}
+
+double math_pow(double x, int y) {
+    assume y>=0;
+    double ret = 1.0;
+    for (int i=0; i<y; i++) {
+        ret *= x;
+    }
+    return ret;
+}
+
+double udf(double x, double y) {
+    double t1 = x - y;
+    double t2 = t1 * t1; //math_pow(t1, 2);
+    return t2;
+}
+
+harness void main(double i1, double i2) {
+    inputs[0] = i1;
+    inputs[1] = i2;
+    
+    double o1 = udf(i1, i2);
+    double o2 = SQL(depth, grammar);
+    assert nFunc==depth-1;
+    assert o1 == o2;
+}

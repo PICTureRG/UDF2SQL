@@ -1,0 +1,22 @@
+//////////////////////////////////////////
+// Models of Array[(String, Any)]
+StringAnyArray StringAnyArray_zip(StringArray sa, AnyArray aa) {
+    assume sa.sz == aa.sz;
+    StringAnyArray ret = new StringAnyArray(sz=sa.sz);
+    for (int i=0; i<sa.sz; i++) {
+        ret.buf[i] = new StringAny(_1=sa.buf[i], _2=aa.buf[i]);
+    }
+    return ret;
+}
+
+StringAnyMap StringAnyArray_toMap(StringAnyArray saa) {
+    StringAnyMap ret = new StringAnyMap(sz=saa.sz);
+    for (int i=0; i<saa.sz; i++) {
+        String s = saa.buf[i]._1;
+        Any a = saa.buf[i]._2;
+        String s1 = new String(sz=s.sz, buf=s.buf);
+        Any a1 = new Any(tpe=a.tpe, sz=a.sz, buf=a.buf);
+        ret.buf[i] = new StringAny(_1=s1, _2=a1);
+    }
+    return ret;
+}

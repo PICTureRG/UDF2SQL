@@ -1,0 +1,60 @@
+
+
+generator String STR2(int d) {
+    if (d==1) return SIMPLE_STR();
+    if (??) return SIMPLE_STR();
+    nFunc ++;
+    return {| SQL_astring_get(SARRAY2(d-1), INT2(d-1)) | SQL_cast_int2str(INT2(d-1)) | SQL_concat(STR2(d-1), STR2(d-1)) | SQL_if_str(BOOL2(d-1), STR2(d-1), STR2(d-1)) | SQL_lower(STR2(d-1)) | SQL_replace2(STR2(d-1), STR2(d-1), STR2(d-1)) | SQL_string_array_join(SARRAY2(d-1), STR2(d-1)) | SQL_substring2(STR2(d-1), INT2(d-1), INT2(d-1)) | SQL_substring_index(STR2(d-1), STR2(d-1), INT2(d-1)) | SQL_trim(STR2(d-1)) |};
+}
+
+generator int INT2(int d) {
+    if (d==1) return SIMPLE_INT();
+    if (??) return SIMPLE_INT();
+    nFunc ++;
+    return {| SQL_add(INT2(d-1), INT2(d-1)) | SQL_astring_len(SARRAY2(d-1)) | SQL_cast_str2int(STR2(d-1)) | SQL_div(INT2(d-1), INT2(d-1)) | SQL_if_int(BOOL2(d-1), INT2(d-1), INT2(d-1)) | SQL_length(STR2(d-1)) | SQL_locate2(STR2(d-1), STR2(d-1), INT2(d-1)) | SQL_mod(INT2(d-1), INT2(d-1)) | SQL_mul(INT2(d-1), INT2(d-1)) | SQL_sub(INT2(d-1), INT2(d-1)) |};
+}
+
+generator bit BOOL2(int d) {
+    if (d==1) {
+        assert 0;
+        return 0;
+    }
+    nFunc ++;
+    return {| SQL_eq(INT2(d-1), INT2(d-1)) | SQL_eq_double(DOUBLE2(d-1), DOUBLE2(d-1)) | SQL_eq_str(STR2(d-1), STR2(d-1)) | SQL_if_bool(BOOL2(d-1), BOOL2(d-1), BOOL2(d-1)) | SQL_le(INT2(d-1), INT2(d-1)) | SQL_le_double(DOUBLE2(d-1), DOUBLE2(d-1)) | SQL_lt_double(DOUBLE2(d-1), DOUBLE2(d-1)) | SQL_neq(INT2(d-1), INT2(d-1)) | SQL_not(BOOL2(d-1)) | SQL_string_array_contains(SARRAY2(d-1), STR2(d-1)) |};
+}
+
+generator double DOUBLE2(int d) {
+    if (d==1) return SIMPLE_DOUBLE();
+    if (??) return SIMPLE_DOUBLE();
+    nFunc ++;
+    return {| SQL_addD(DOUBLE2(d-1), DOUBLE2(d-1)) | SQL_cast_str2double(STR2(d-1)) | SQL_divD(DOUBLE2(d-1), DOUBLE2(d-1)) | SQL_if_double(BOOL2(d-1), DOUBLE2(d-1), DOUBLE2(d-1)) | SQL_mulD(DOUBLE2(d-1), DOUBLE2(d-1)) | SQL_subD(DOUBLE2(d-1), DOUBLE2(d-1)) |};
+}
+
+generator StringArray SARRAY2(int d) {
+    if (d==1) return SARRAY_INPUT();
+    if (??) return SARRAY_INPUT();
+    nFunc ++;
+    return {| SQL_if_astr(BOOL2(d-1), SARRAY2(d-1), SARRAY2(d-2)) | SQL_map_string_any_keys(SAMAP2(d-1)) | SQL_string_array0() | SQL_string_array1(STR2(d-1)) | SQL_string_array2(STR2(d-1), STR2(d-1)) | SQL_string_array_concat(SARRAY2(d-1), SARRAY2(d-1)) | SQL_string_array_intersect(SARRAY2(d-1), SARRAY2(d-1)) |};
+}
+
+generator StringAnyMap SAMAP2(int d) {
+    if (d==1) {
+        assert 0;
+        return new StringAnyMap(sz=0, buf={});
+    }
+    nFunc ++;
+    return {| SQL_map_string_any_concat(SAMAP2(d-1), SAMAP2(d-1)) | SQL_map_string_any_from_arrays(SARRAY2(d-1), AARRAY2(d-1)) |};
+}
+
+generator AnyArray AARRAY2(int d) {
+    if (d==1) {
+        assert 0;
+        return new AnyArray(sz=0, buf={});
+    }
+    nFunc ++;
+    return {| SQL_any_array1(ANY2(d-1)) | SQL_any_array2(ANY2(d-1), ANY2(d-1)) | SQL_map_string_any_values(SAMAP2(d-1)) |};
+}
+
+generator Any ANY2(int d) {
+    return Any1(d);
+}

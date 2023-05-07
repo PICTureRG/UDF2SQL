@@ -1,0 +1,48 @@
+//--bnd-inbits=2
+
+include "common/types.skh";
+include "common/String.sk";
+include "common/StringArray.sk";
+include "common/SQLFunctions.sk";
+include "common/G1.sk";
+include "common/G2.sk";
+include "config.sk";
+
+//////////////////////////////////////////
+// Driver
+String[2] inputs;
+
+generator String SIMPLE_STR() {
+    return {| EMPTY_STRING | inputs[0] | inputs[1] |};
+}
+
+generator int SIMPLE_INT() {
+    return {| -1 | 0 | 1 |};
+}
+
+generator double SIMPLE_DOUBLE() {
+    return {| 1.0 |};
+}
+
+String udf(String x, String y) {
+    StringArray arr = String_split(x, y);
+    return StringArray_get(arr, 0);
+}
+
+generator String SQL(int depth, int grammar) {
+    if (grammar==1) return STR1(depth);
+    if (grammar==2) return STR2(depth);
+    assert 0;
+}
+
+harness void main(int sz1, char[sz1] buf1, int sz2, char[sz2] buf2) {
+    assume sz2>0;
+    String x = new String(sz=sz1, buf=buf1);
+    String y = new String(sz=sz2, buf=buf2);
+    inputs[0] = x;
+    inputs[1] = y;
+    
+    String z1 = udf(x, y);
+    String z2 = SQL(depth, grammar);
+    assert String_equals(z1, z2);
+}

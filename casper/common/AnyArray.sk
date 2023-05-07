@@ -1,0 +1,9 @@
+//////////////////////////////////////////
+// Models of Array[Any]
+AnyArray AnyArray1(Any a) {
+    return new AnyArray(sz=1, buf={a});
+}
+
+AnyArray AnyArray2(Any a, Any b) {
+    return new AnyArray(sz=2, buf={a, b});
+}

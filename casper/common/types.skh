@@ -1,0 +1,37 @@
+//////////////////////////////////////////
+// Models of data types
+struct String{
+    int sz;
+    char[sz] buf;
+}
+
+struct StringArray{
+    int sz;
+    String[sz] buf;
+}
+
+struct Any{
+    int tpe;
+    int sz;
+    char[sz] buf;
+}
+
+struct AnyArray{
+    int sz;
+    Any[sz] buf;
+}
+
+struct StringAny{
+    String _1;
+    Any _2;
+}
+
+struct StringAnyArray{
+    int sz;
+    StringAny[sz] buf;
+}
+
+struct StringAnyMap{
+    int sz;
+    StringAny[sz] buf;
+}

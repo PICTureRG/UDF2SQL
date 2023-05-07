@@ -1,0 +1,70 @@
+//--bnd-inbits=2 --fe-fpencoding AS_FIXPOINT
+
+include "common/types.skh";
+include "common/String.sk";
+include "common/StringArray.sk";
+include "common/Any.sk";
+include "common/AnyArray.sk";
+include "common/StringAnyArray.sk";
+include "common/StringAnyMap.sk";
+include "common/SQLFunctions.sk";
+include "common/G1.sk";
+include "common/G2.sk";
+include "config.sk";
+
+//////////////////////////////////////////
+// Driver
+generator String SIMPLE_STR() {
+    return {| EMPTY_STRING |};
+}
+
+generator int SIMPLE_INT() {
+    return {| -1 | 0 | 1 |};
+}
+
+generator double SIMPLE_DOUBLE() {
+    return {| 1.0 |};
+}
+
+StringArray udf(StringArray arr1, StringArray arr2) {
+    bit t1 = 1;
+    bit t2 = 1;
+    bit t3 = t1 && t2;
+    StringArray t4 = StringArray_intersect(arr1, arr2);
+    StringArray t6 = StringArray0();
+    StringArray t7 = t3 ? t4 : t6;
+    return t7;
+}
+
+generator StringArray SQL(int depth, int grammar) {
+    if (grammar==1) return SARRAY1(depth);
+    if (grammar==2) return SARRAY2(depth);
+    assert 0;
+}
+
+harness void main(int sz1, int sz11, char[sz11] buf11, int sz12, char[sz12] buf12, int sz13, char[sz13] buf13, int sz14, char[sz14] buf14, int sz2, int sz21, char[sz21] buf21, int sz22, char[sz22] buf22, int sz23, char[sz23] buf23, int sz24, char[sz24] buf24) {
+    assume sz1 >= 0 && sz2 <= 4;
+    assume sz2 >= 0 && sz2 <= 4;
+
+    StringArray arr1 = new StringArray(sz=sz1);
+    if (sz1 > 0) arr1.buf[0] = new String(sz=sz11, buf=buf11);
+    if (sz1 > 1) arr1.buf[1] = new String(sz=sz12, buf=buf12);
+    if (sz1 > 2) arr1.buf[2] = new String(sz=sz13, buf=buf13);
+    if (sz1 > 3) arr1.buf[3] = new String(sz=sz14, buf=buf14);
+
+    StringArray arr2 = new StringArray(sz=sz2);
+    if (sz2 > 0) arr2.buf[0] = new String(sz=sz21, buf=buf21);
+    if (sz2 > 1) arr2.buf[1] = new String(sz=sz22, buf=buf22);
+    if (sz2 > 2) arr2.buf[2] = new String(sz=sz23, buf=buf23);
+    if (sz2 > 3) arr2.buf[3] = new String(sz=sz24, buf=buf24);
+
+    string_array_inputs[0] = arr1;
+    string_array_inputs[1] = arr2;
+    n_string_array_inputs = 2;
+    
+    StringArray z1 = udf(arr1, arr2);
+    StringArray z2 = SQL(depth, grammar);
+    assert nFunc==depth-1;
+
+    assert StringArray_equals(z1, z2);
+}

@@ -1,0 +1,59 @@
+//--bnd-inbits=2 --fe-fpencoding AS_FIXPOINT
+
+include "common/types.skh";
+include "common/String.sk";
+include "common/StringArray.sk";
+include "common/Any.sk";
+include "common/AnyArray.sk";
+include "common/StringAnyArray.sk";
+include "common/StringAnyMap.sk";
+include "common/SQLFunctions.sk";
+include "common/G1.sk";
+include "common/G2.sk";
+include "config.sk";
+
+//////////////////////////////////////////
+// Driver
+String[4] input0;
+
+generator String SIMPLE_STR() {
+    return {| EMPTY_STRING | input0[0] | input0[1] |input0[2] |input0[3] |};
+}
+
+generator int SIMPLE_INT() {
+    return {| -1 | 0 | 1 |};
+}
+
+generator double SIMPLE_DOUBLE() {
+    return {| 1.0 |};
+}
+
+generator String SQL(int depth, int grammar) {
+    if (grammar==1) return STR1(depth);
+    if (grammar==2) return STR2(depth);
+    assert 0;
+}
+
+harness void main(int sz1, char[sz1] buf1,int sz2, char[sz2] buf2,int sz3, char[sz3] buf3,int sz4, char[sz4] buf4) {
+
+    String x1 = new String(sz=sz1, buf=buf1);
+    String x2 = new String(sz=sz2, buf=buf2);
+    String x3 = new String(sz=sz3, buf=buf3);
+    String x4 = new String(sz=sz4, buf=buf4);
+
+    input0[0] = x1;
+    input0[1] = x2;
+    input0[2] = x3;
+    input0[3] = x4;
+
+    // udf
+
+
+    // sql
+    String o1 = SQL(depth, grammar);
+    String o2 = SQL(depth, grammar);
+    String o3 = SQL(depth, grammar);
+    String o4 = SQL(depth, grammar);
+    assert nFunc==depth-1;
+    assert o1 == input0[0] && o2 == input0[1] && o3 == input0[2] && o4 == input0[3];
+}

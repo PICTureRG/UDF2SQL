@@ -1,0 +1,55 @@
+//--bnd-inbits=3 --fe-fpencoding AS_FIXPOINT
+
+include "common/types.skh";
+include "common/String.sk";
+include "common/StringArray.sk";
+include "common/Any.sk";
+include "common/AnyArray.sk";
+include "common/StringAnyArray.sk";
+include "common/StringAnyMap.sk";
+include "common/SQLFunctions.sk";
+include "common/G1.sk";
+include "common/G2.sk";
+include "config.sk";
+
+//////////////////////////////////////////
+// Driver
+String[1] inputs;
+
+String SEP = new String(sz=1, buf={','});
+
+generator String SIMPLE_STR() {
+    return {| EMPTY_STRING | inputs[0] |};
+}
+
+generator int SIMPLE_INT() {
+    return {| -1 | 0 | 1 | 2 |};
+}
+
+generator double SIMPLE_DOUBLE() {
+    return {| 1.0 |};
+}
+
+generator String SQLS(int depth, int grammar) {
+    if (grammar==1) return STR1(depth);
+    if (grammar==2) return STR2(depth);
+    assert 0;
+}
+
+harness void main(int sz1, char[sz1] buf1) {
+    inputs[0] = new String(sz=sz1, buf=buf1);
+
+    StringArray columns = String_split(inputs[0], SEP);
+    String t2 = StringArray_get(columns, 0);
+    String t3 = StringArray_get(columns, 1);
+    String t4 = StringArray_get(columns, 2);
+
+    String o1 = SQLS(depth, grammar);
+    String o2 = SQLS(depth, grammar);
+    String o3 = SQLS(depth, grammar);
+    assert nFunc==depth-1;
+
+    assert String_equals(t2, o1);
+    assert String_equals(t3, o2);
+    assert String_equals(t4, o3);
+}
